@@ -35,10 +35,10 @@ def menu_principal():
 
 def ligaportuguesa(url):
       link=clean(abrir_url(url))
-      conteudos= re.compile("""class='linkgoal sapo' id='(.+?)'><h3.+?><img.+?src='.+?'.+?><span.+?>(.+?)</span></h3>""").findall(link)
+      conteudos= re.compile("""class='linkgoal sapo' id='(.+?)'><h3.+?><img.+?src='.+?'.+?><span.+?>(.+?)vs(.+?)</span></h3>""").findall(link)
       from random import randint
-      for endereco,titulo in conteudos:
-            addDir(titulo,'http://www.goalsoftheworld.tk/getcontent.php?rand=%s&id_results=%s' % (str(randint(1, 100)),endereco),1,tvgolopath+art+'pt.png',len(conteudos),False)
+      for endereco,titulo1,titulo2 in conteudos:
+            addDir(titulo1+'-'+titulo2,'http://www.goalsoftheworld.tk/getcontent.php?rand=%s&id_results=%s' % (str(randint(1, 100)),endereco),1,tvgolopath+art+'pt.png',len(conteudos),False)
       xbmc.executebuiltin("Container.SetViewMode(51)")
 
 def listadeligas(url):
@@ -77,8 +77,8 @@ def programacaotv(url):
 def request(url):
       link=abrir_url(url)
       link=clean(link)
-      listagolos=re.compile('<div class="listajogos"><a href="(.+?)"><img.+?src="images/(.+?)\..+?" />    (.+?)</a></div>').findall(link)
-      for endereco,thumb,titulo in listagolos: addDir(titulo,MainURL + endereco,1,tvgolopath+art+thumb+'.png',len(listagolos),False)
+      listagolos=re.compile('<div class="listajogos"><a href="(.+?)"><img.+?src="images/(.+?)\..+?" />\s+?([0-9]{4}\.[0-9]{2}\.[0-9]{2})\s*(\([0-9]{2}h[0-9]{2}\))\s*-\s*([A-Za-z]+?)\s*([0-9]*)\s*-\s*([0-9]*)\s*([A-Za-z]+?)</a></div>').findall(link)
+      for endereco,thumb,data,hora,equipa1,resultado1,resultado2,equipa2 in listagolos: addDir(data+' '+hora+' - '+equipa1+' '+resultado1+' - '+resultado2+' '+equipa2,MainURL + endereco,1,tvgolopath+art+thumb+'.png',len(listagolos),False)
       if re.search('football.php', url) or re.search('page-start', link): paginas(url,link)
       xbmc.executebuiltin("Container.SetViewMode(51)")
 
