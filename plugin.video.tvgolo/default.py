@@ -26,7 +26,7 @@ def horalocal(link):
 
 def menu_principal():
       addDir(traducao(40003),MainURL,2,tvgolopath+art+'ulgolos.png',1,True)
-      addDir('Últimos Liga Portuguesa','http://www.goalsoftheworld.tk/goals-in-Portugal.html',10,tvgolopath+art+'liga.png',1,True)
+      addDir('Últimos Liga Portugal','http://www.goalsoftheworld.tk/goals-in-Portugal.html',10,tvgolopath+art+'liga.png',1,True)
       addDir(traducao(40004),MainURL,3,tvgolopath+art+'ugolosl2.png',1,True)
       addDir(traducao(40005),MainURL,4,tvgolopath+art+'semana.png',1,True)
       addDir(traducao(40007),MainURL + 'seasons-archive.php',5,tvgolopath+art+'epoca.png',1,True)
@@ -45,7 +45,9 @@ def listadeligas(url):
       link=abrir_url(url)
       link=link.replace('Portuguese</a>','').replace('English</a>','')
       ligas=re.compile("""<li class='active'><a href='(.+?)' class="menulinks">.+?alt="(.+?)" src="http://www.okgoals.com/images/(.+?)"> (.+?)</span>""").findall(link)
-      for endereco,liga,thumb,country in ligas: addDir('%s (%s)' % (liga.capitalize().title(),country.capitalize().title()),MainURL + endereco,2,tvgolopath+art+thumb,len(ligas),True)
+      for endereco,liga,thumb,country in ligas:
+            liga=liga.replace('EPL','Premiere League')
+            addDir('%s (%s)' % (liga.capitalize().title(),country.capitalize().title()),MainURL + endereco,2,tvgolopath+art+thumb,len(ligas),True)
       xbmc.executebuiltin("Container.SetViewMode(51)")
 
 def semanasanteriores(url):
