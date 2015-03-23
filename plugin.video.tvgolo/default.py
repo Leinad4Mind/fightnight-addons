@@ -35,12 +35,14 @@ def menu_principal():
 
 def ligaportuguesa(url):
       link=clean(abrir_url(url))
-      conteudos= re.compile("""class='linkgoal sapo' id='(.+?)'><h3.+?><img.+?src='.+?'.+?><span.+?>(.+?)vs(.+?)</span></h3>""").findall(link)
+      conteudos= re.compile("""class='linkgoal sapo' id='(.+?)'><h3.+?><img.+?src='.+?'.+?><span.+?>(.+?)\((.+?):(.+?)\)\s*-\s*(.+?)\s*([0-9]*)\s*vs\s*([0-9]*)\s*(.+?)</span></h3>""").findall(link)
       from random import randint
-      for endereco,titulo1,titulo2 in conteudos:
-            titulo1=titulo1.replace('&aacute;','á').replace('&Aacute;','Á').replace('&atilde;','ã').replace('&eacute;','é').replace('&Eacute;','É').replace('&iacute;','í').replace('&otilde;','õ').replace('&uacute;','ú').replace('&ccedil;','ç')
-            titulo2=titulo2.replace('&aacute;','á').replace('&Aacute;','Á').replace('&atilde;','ã').replace('&eacute;','é').replace('&Eacute;','É').replace('&iacute;','í').replace('&otilde;','õ').replace('&uacute;','ú').replace('&ccedil;','ç')
-            addDir(titulo1+'-'+titulo2,'http://www.goalsoftheworld.tk/getcontent.php?rand=%s&id_results=%s' % (str(randint(1, 100)),endereco),1,tvgolopath+art+'pt.png',len(conteudos),False)
+      for endereco,data,hora1,hora2,equipa1,resultado1,resultado2,equipa2 in conteudos:
+            equipa1=equipa1.replace('&aacute;','á').replace('&Aacute;','Á').replace('&atilde;','ã').replace('&eacute;','é').replace('&Eacute;','É').replace('&iacute;','í').replace('&otilde;','õ').replace('&uacute;','ú').replace('&ccedil;','ç')
+            equipa2=equipa2.replace('&aacute;','á').replace('&Aacute;','Á').replace('&atilde;','ã').replace('&eacute;','é').replace('&Eacute;','É').replace('&iacute;','í').replace('&otilde;','õ').replace('&uacute;','ú').replace('&ccedil;','ç')
+            if len(resultado1)==0 : resultado1=str('#')
+            if len(resultado2)==0 : resultado2=str('#')
+            addDir('[COLOR orange]'+data+'[/COLOR] [COLOR darkorange]('+hora1+'h'+hora2+')[/COLOR][COLOR blue] - [/COLOR][COLOR white]'+equipa1+'[/COLOR] [COLOR yellow]'+resultado1+' - '+resultado2+'[/COLOR] [COLOR white]'+equipa2+'[/COLOR]','http://www.goalsoftheworld.tk/getcontent.php?rand=%s&id_results=%s' % (str(randint(1, 100)),endereco),1,tvgolopath+art+'pt.png',len(conteudos),False)
       xbmc.executebuiltin("Container.SetViewMode(51)")
 
 def listadeligas(url):
@@ -82,7 +84,7 @@ def request(url):
       link=abrir_url(url)
       link=clean(link)
       listagolos=re.compile('<div class="listajogos"><a href="(.+?)"><img.+?src="images/(.+?)\..+?" />\s+?([0-9]{4}\.[0-9]{2}\.[0-9]{2})\s*(\([0-9]{2}h[0-9]{2}\))\s*-\s*([A-Za-z ]+?)\s*([0-9]*)\s*-\s*([0-9]*)\s*([A-Za-z ]+?)</a></div>').findall(link)
-      for endereco,thumb,data,hora,equipa1,resultado1,resultado2,equipa2 in listagolos: addDir(data+' '+hora+' - '+equipa1+' '+resultado1+' - '+resultado2+' '+equipa2,MainURL + endereco,1,tvgolopath+art+thumb+'.png',len(listagolos),False)
+      for endereco,thumb,data,hora,equipa1,resultado1,resultado2,equipa2 in listagolos: addDir('[COLOR orange]'+data+'[/COLOR] [COLOR darkorange]'+hora+'[/COLOR][COLOR blue] - [/COLOR][COLOR white]'+equipa1+'[/COLOR] [COLOR yellow]'+resultado1+' - '+resultado2+'[/COLOR] [COLOR white]'+equipa2+'[/COLOR]',MainURL + endereco,1,tvgolopath+art+thumb+'.png',len(listagolos),False)
       if re.search('football.php', url) or re.search('page-start', link): paginas(url,link)
       xbmc.executebuiltin("Container.SetViewMode(51)")
 
