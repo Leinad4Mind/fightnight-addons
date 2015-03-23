@@ -81,7 +81,7 @@ def programacaotv(url):
 def request(url):
       link=abrir_url(url)
       link=clean(link)
-      listagolos=re.compile('<div class="listajogos"><a href="(.+?)"><img.+?src="images/(.+?)\..+?" />\s+?([0-9]{4}\.[0-9]{2}\.[0-9]{2})\s*(\([0-9]{2}h[0-9]{2}\))\s*-\s*([A-Za-z]+?)\s*([0-9]*)\s*-\s*([0-9]*)\s*([A-Za-z]+?)</a></div>').findall(link)
+      listagolos=re.compile('<div class="listajogos"><a href="(.+?)"><img.+?src="images/(.+?)\..+?" />\s+?([0-9]{4}\.[0-9]{2}\.[0-9]{2})\s*(\([0-9]{2}h[0-9]{2}\))\s*-\s*([A-Za-z ]+?)\s*([0-9]*)\s*-\s*([0-9]*)\s*([A-Za-z ]+?)</a></div>').findall(link)
       for endereco,thumb,data,hora,equipa1,resultado1,resultado2,equipa2 in listagolos: addDir(data+' '+hora+' - '+equipa1+' '+resultado1+' - '+resultado2+' '+equipa2,MainURL + endereco,1,tvgolopath+art+thumb+'.png',len(listagolos),False)
       if re.search('football.php', url) or re.search('page-start', link): paginas(url,link)
       xbmc.executebuiltin("Container.SetViewMode(51)")
@@ -393,7 +393,7 @@ def pesquisa():
       keyb = xbmc.Keyboard('', traducao(40020))
       keyb.doModal()
       if (keyb.isConfirmed()):
-            mensagemok(traducao(40000),traducao(40021),'Não inclui liga PT.')
+            mensagemok(traducao(40000),traducao(40021),'Não inclui a Liga Portugal.')
             search = keyb.getText()
             encode=urllib.quote(search)
             if encode=='': pass
