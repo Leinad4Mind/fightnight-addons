@@ -288,7 +288,7 @@ def pastas(url,name,formcont={},conteudo='',past=False):
                   for urlpasta,nomepasta,password in seleccionados:
                         if re.search('<span class="pass">',password): displock=' (' + traducao(40024)+')'
                         else:displock=''
-                        addDir(nomepasta + displock,MainURL + urlpasta,3,wtpath + art + 'pasta.png',len(seleccionados),True)
+                        addDir('[COLOR white]' + nomepasta + '[/COLOR]' + displock,MainURL + urlpasta,3,wtpath + art + 'pasta.png',len(seleccionados),True)
             except: pass
             #contributo mafarricos com alteracoes, ty
             items1=re.compile('<li class="fileItemContainer">\s+<p class="filename">\s+<a class="downloadAction" href=".+?">    <span class="bold">.+?</span>(.+?)</a>\s+</p>\s+<div class="thumbnail">\s+<div class="thumbnailWrapper expType" rel="Image" style=".+?">\s+<a href="(.+?)" class="thumbImg" rel="highslide" style=".+?" title="(.+?)">\s+<img src=".+?" rel=".+?" alt=".+?" style=".+?"/>\s+</a>\s+</div>\s+</div>\s+<div class="smallTab">\s+<ul>\s+<li>\s+(.+?)</li>\s+<li><span class="date">(.+?)</span></li>').findall(conteudo)         
@@ -303,7 +303,7 @@ def pastas(url,name,formcont={},conteudo='',past=False):
                   tamanhoparavariavel=' (' + tamanhoficheiro + ')'
                   if past==False: modo=4
                   else: modo=22
-                  addCont('[B]' + tituloficheiro + '[/B]' + tamanhoparavariavel,MainURL + urlficheiro,modo,tamanhoparavariavel,thumb,len(items1),past,False)                  
+                  addCont('[B][COLOR orange]' + tituloficheiro +'[/COLOR][COLOR white]' + extensao + '[/COLOR][/B]' + '[COLOR darkgreen]' + tamanhoparavariavel + '[/COLOR]',MainURL + urlficheiro,modo,tamanhoparavariavel,thumb,len(items1),past,False)
             #contributo mafarricos com alteracoes, ty
             items2=re.compile('<ul class="borderRadius tabGradientBg">.+?<li><span>(.+?)</span></li>.+?<li><span class="date">(.+?)</span></li></ul></div>.+?<ul>            <li><a href="/(.+?)" class="downloadAction".+?<li class="fileActionsFacebookSend" data-url=".+?" data-title="(.+?)">.+?<span class="bold">.+?</span>(.+?)</a>').findall(conteudo)
             for tamanhoficheiro,dataficheiro,urlficheiro, tituloficheiro,extensao in items2:
@@ -316,19 +316,19 @@ def pastas(url,name,formcont={},conteudo='',past=False):
                   tamanhoparavariavel=' (' + tamanhoficheiro + ')'
                   if past==False: modo=4
                   else: modo=22
-                  addCont('[B]' + tituloficheiro + extensao + '[/B]' + tamanhoparavariavel,MainURL + urlficheiro,modo,tamanhoparavariavel,thumb,len(items2),past,False)
+                  addCont('[B][COLOR orange]' + tituloficheiro +'[/COLOR][COLOR white]' + extensao + '[/COLOR][/B]' + '[COLOR darkgreen]' + tamanhoparavariavel + '[/COLOR]',MainURL + urlficheiro,modo,tamanhoparavariavel,thumb,len(items2),past,False)
             if not items1:
                   if not items2:
                         conteudo=clean(conteudo)
                         #isto ta feio
-                        items3=re.compile('<div class="thumbnail">.+?<a href="(.+?)".+?title="(.+?)">.+?<div class="smallTab">.+?<li>(.+?)</li>.+?<span class="date">(.+?)</span>').findall(conteudo)
-                        for urlficheiro,tituloficheiro, tamanhoficheiro,dataficheiro in items3:
+                        items3=re.compile('<div class="thumbnail">.+?<a href="(.+?)".+?title="(.+?)(.{4})">.+?<div class="smallTab">.+?<li>(.+?)</li>.+?<span class="date">(.+?)</span>').findall(conteudo)
+                        for urlficheiro,tituloficheiro,extensao,tamanhoficheiro,dataficheiro in items3:
                               tamanhoficheiro=tamanhoficheiro.replace(' ','')
                               thumb=wtpath + art + 'file.png'
                               tamanhoparavariavel=' (' + tamanhoficheiro + ')'
                               if past==False: modo=4
                               else: modo=22
-                              addCont('[B]' + tituloficheiro + '[/B]' + tamanhoparavariavel,MainURL + urlficheiro,modo,tamanhoparavariavel,thumb,len(items2),past,False)
+                              addCont('[B][COLOR orange]' + tituloficheiro +'[/COLOR][COLOR white]' + extensao + '[/COLOR][/B]' + '[COLOR darkgreen]' + tamanhoparavariavel + '[/COLOR]',MainURL + urlficheiro,modo,tamanhoparavariavel,thumb,len(items2),past,False)
                               
             paginas(conteudo)
             
@@ -927,7 +927,7 @@ def get_params():
       return param
 
 def clean(text):
-      command={'\r':'','\n':'','\t':'','&nbsp;':' ','&quot;':'"','&amp;':'&','&ntilde;':'ñ','&#039;':'','&#39;':"'",'&170;':'ª','&#192;':'À','&#193;':'Á','&#194;':'Â','&#195;':'Ã','&#199;':'Ç','&#201;':'É','&#202;':'Ê','&#205;':'Í','&#211;':'Ó','&#212;':'Ó','&#213;':'Õ','&#217;':'Ù','&#218;':'Ú','&#224;':'à','&#225;':'á','&#226;':'â','&#227;':'ã','&#231;':'ç','&#233;':'é','&#234;':'ê','&#237;':'í','&#243;':'ó','&#244;':'ô','&#245;':'õ','&#249;':'ù','&#250;':'ú'}
+      command={'\r':'','\n':'','\t':'','&nbsp;':' ','&quot;':'"','&amp;':'&','&ntilde;':'ñ','&#39;':'\'','&#170;':'ª','&#178;':'²','&#179;':'³','&#192;':'À','&#193;':'Á','&#194;':'Â','&#195;':'Ã','&#199;':'Ç','&#201;':'É','&#202;':'Ê','&#205;':'Í','&#211;':'Ó','&#212;':'Ó','&#213;':'Õ','&#217;':'Ù','&#218;':'Ú','&#224;':'à','&#225;':'á','&#226;':'â','&#227;':'ã','&#231;':'ç','&#232;':'è','&#233;':'é','&#234;':'ê','&#237;':'í','&#243;':'ó','&#244;':'ô','&#245;':'õ','&#249;':'ù','&#250;':'ú'}
       regex = re.compile("|".join(map(re.escape, command.keys())))
       return regex.sub(lambda mo: command[mo.group(0)], text)
 
