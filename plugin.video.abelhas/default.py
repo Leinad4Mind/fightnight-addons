@@ -73,9 +73,9 @@ def login_abelhas(defora=False):
 def menu_principal(ligacao):
       if ligacao==1:
             conteudo=clean(abrir_url_cookie('http://abelhas.pt/action/Help'))
-            pontos=re.compile('href="/Points.aspx" title="Pontos" rel="nofollow".+?</a><strong>(.+?)</strong>').findall(conteudo)[0]
-            mensagens=re.compile('href="/action/PrivateMessage" id="topbarMessage".+?</a><strong>(.+?)</strong>').findall(conteudo)[0]
-            transf=re.compile('Transfe.+?ncia.+?<strong>(.+?)</strong>').findall(conteudo)[0]
+            #pontos=re.compile('href="/Points.aspx" title="Pontos" rel="nofollow".+?</a><strong>(.+?)</strong>').findall(conteudo)[0]
+            #mensagens=re.compile('href="/action/PrivateMessage" id="topbarMessage".+?</a><strong>(.+?)</strong>').findall(conteudo)[0]
+            #transf=re.compile('Transfe.+?ncia.+?<strong>(.+?)</strong>').findall(conteudo)[0]
             addDir(traducao(40007),MainURL,1,wtpath + art + 'pasta.png',1,True)
             addDir(traducao(40008),MainURL,2,wtpath + art + 'pasta.png',2,True)
             addDir(traducao(40009),MainURL + username,3,wtpath + art + 'pasta.png',2,True)
@@ -85,8 +85,8 @@ def menu_principal(ligacao):
             addDir(traducao(40011),'pesquisa',7,wtpath + art + 'pasta.png',3,True)
       elif ligacao==0:
             addDir(traducao(40015),MainURL,6,wtpath + art + 'pasta.png',1,True)
-      if ligacao==1: addLink("[COLOR blue][B]%s:[/B][/COLOR] %s  [COLOR blue][B]%s:[/B][/COLOR] %s" % (traducao(40012),mensagens,traducao(40014),pontos),'',wtpath + art + 'pasta.png')
-      addDir("[COLOR blue][B]%s[/B][/COLOR] | abelhas.pt" % (traducao(40018)),MainURL,8,wtpath + art + 'pasta.png',6,True)
+      #if ligacao==1: addLink("[COLOR blue][B]%s:[/B][/COLOR] %s  [COLOR blue][B]%s:[/B][/COLOR] %s" % (traducao(40012),mensagens,traducao(40014),pontos),'',wtpath + art + 'pasta.png')
+      #addDir("[COLOR blue][B]%s[/B][/COLOR] | abelhas.pt" % (traducao(40018)),MainURL,8,wtpath + art + 'pasta.png',6,True)
       xbmc.executebuiltin("Container.SetViewMode(51)")
 
 def entrarnovamente(opcoes):
@@ -291,7 +291,7 @@ def pastas(url,name,formcont={},conteudo='',past=False):
                         addDir(nomepasta + displock,MainURL + urlpasta,3,wtpath + art + 'pasta.png',len(seleccionados),True)
             except: pass
             #contributo mafarricos com alteracoes, ty
-            items1=re.compile('<li class="fileItemContainer">\s+<p class="filename">\s+<a class="downloadAction" href=".+?">    <span class="bold">.+?</span>(.+?)</a>\s+</p>\s+<div class="thumbnail">\s+<div class="thumbnailWrapper expType" rel="Image" style=".+?">\s+<a href="(.+?)" class="thumbImg" rel="highslide" style=".+?" title="(.+?)">\s+<img src=".+?" rel=".+?" alt=".+?" style=".+?"/>\s+</a>\s+</div>\s+</div>\s+<div class="smallTab">\s+<ul>\s+<li>\s+(.+?)</li>\s+<li><span class="date">(.+?)</span></li>').findall(conteudo)         
+            items1=re.compile('<a class="expanderHeader downloadAction" href="(.+?)" title="(.+?)">.+?</span>(.+?)</a>.+?<li><span>(.+?)</span></li>.+?<span class="downloadsCounter">.+?<li>(.+?)</li>').findall(conteudo)
             for extensao,urlficheiro,tituloficheiro,tamanhoficheiro,dataficheiro in items1:
                   extensao=extensao.replace(' ','')
                   tamanhoficheiro=tamanhoficheiro.replace(' ','')
@@ -305,7 +305,7 @@ def pastas(url,name,formcont={},conteudo='',past=False):
                   else: modo=22
                   addCont('[B]' + tituloficheiro + '[/B]' + tamanhoparavariavel,MainURL + urlficheiro,modo,tamanhoparavariavel,thumb,len(items1),past,False)                  
             #contributo mafarricos com alteracoes, ty
-            items2=re.compile('<ul class="borderRadius tabGradientBg">.+?<li><span>(.+?)</span></li>.+?<li><span class="date">(.+?)</span></li></ul></div>.+?<ul>            <li><a href="/(.+?)" class="downloadAction".+?<li class="fileActionsFacebookSend" data-url=".+?" data-title="(.+?)">.+?<span class="bold">.+?</span>(.+?)</a>').findall(conteudo)
+            items2=re.compile('<a class="expanderHeader downloadAction" href="(.+?)" title="(.+?)">\s+<span class="bold">.+?</span>(.+?)</a>.+?<li><span>(.+?)</span></li>.+?<span class="downloadsCounter">.+?<li>(.+?)</li>').findall(conteudo)
             for tamanhoficheiro,dataficheiro,urlficheiro, tituloficheiro,extensao in items2:
                   extensao=extensao.replace(' ','')
                   if extensao=='.rar' or extensao=='.RAR' or extensao == '.zip' or extensao=='.ZIP' or extensao=='.RAR' or extensao=='.7z' or extensao=='.7Z': thumb=wtpath + art + 'rar.png'
