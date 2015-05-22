@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.abelhas"
-       name="Abelhas.pt e Minhateca"
-       version="1.0.1"
+       name="Abelhas"
+       version="1.0.2"
        provider-name="fightnight">
     <requires>
         <import addon="xbmc.python" version="2.1.0"/>
@@ -11,8 +11,8 @@
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary>Conteudos do site Abelhas.pt e Minhateca no Kodi</summary>
-        <description>Ve os teus conteudos e os da comunidade abelhas/minhateca no Kodi.</description>
+        <summary>Conteudos do site Abelhas.pt, Minhateca e Toutbox no Kodi</summary>
+        <description>Ve os teus conteudos e os da comunidade abelhas/minhateca/toutbox no Kodi.</description>
         <platform>all</platform>
     </extension>
 </addon>
