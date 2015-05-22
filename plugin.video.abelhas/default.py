@@ -13,6 +13,7 @@ versao = '1.0.1'
 addon_id = 'plugin.video.abelhas'
 MainURL = 'http://abelhas.pt/'
 MinhaMainURL = 'http://minhateca.com.br/'
+ToutMainURL = 'http://toutbox.fr/'
 art = '/resources/art/'
 user_agent = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1468.0 Safari/537.36'
 selfAddon = xbmcaddon.Addon(id=addon_id)
@@ -26,12 +27,15 @@ pastaperfil = xbmc.translatePath(selfAddon.getAddonInfo('profile')).decode('utf-
 cookies = os.path.join(pastaperfil, "cookies.lwp")
 username_ab = urllib.quote(selfAddon.getSetting('abelhas-username'))
 username_mt = urllib.quote(selfAddon.getSetting('minhateca-username'))
+username_tb = urllib.quote(selfAddon.getSetting('toutbox-username'))
 
 ####
 if selfAddon.getSetting('abelhas-enable') == 'true' and selfAddon.getSetting('abelhas-check') == 'true': status_abelhas=True
 else: status_abelhas=False
 if selfAddon.getSetting('minhateca-enable') == 'true' and selfAddon.getSetting('minhateca-check') == 'true':status_minhateca=True
 else: status_minhateca=False
+if selfAddon.getSetting('toutbox-enable') == 'true' and selfAddon.getSetting('toutbox-check') == 'true':status_toutbox=True
+else: status_toutbox=False
 ####
 
 def traducao(texto):
@@ -77,6 +81,7 @@ def login_abelhas(defora=False):
             #else: login_abelhas()
       else: return False
             
+#################################################### LOGIN MINHATECA #####################################################
 def login_minhateca(defora=False):
       print "Sem cookie. A iniciar login"
       try:
@@ -115,6 +120,46 @@ def login_minhateca(defora=False):
             #if opcao: menu_principal(0)
             #else: login_minhateca()
       else: return False
+            
+#################################################### LOGIN TOUTBOX #####################################################
+def login_toutbox(defora=False):
+      print "Sem cookie. A iniciar login"
+      try:
+            link=abrir_url(ToutMainURL)
+            token=re.compile('<input name="__RequestVerificationToken" type="hidden" value="(.+?)" />').findall(link)[0]
+            
+            
+            form_d = {'RedirectUrl':'','Redirect':'True','FileId':0,'Login':username_tb,'Password':selfAddon.getSetting('toutbox-password'),'RememberMe':'true','__RequestVerificationToken':token}
+            ref_data = {'Accept': '*/*', 'Content-Type': 'application/x-www-form-urlencoded','Origin': 'http://toutbox.fr', 'X-Requested-With': 'XMLHttpRequest', 'Referer': 'http://toutbox.fr/','User-Agent':user_agent}
+            endlogin=ToutMainURL + 'action/login/login'
+            try:
+                  logintest= net.http_POST(endlogin,form_data=form_d,headers=ref_data).content.encode('latin-1','ignore')
+            except:
+                  logintest='Erro'
+      except:
+            link='Erro'
+            logintest='Erro'
+
+      if re.search('003eA senha indicada n',logintest):
+            mensagemok('Toutbox',traducao(40002))
+            entrarnovamente(1)
+            return False
+      elif re.search('existe. Certifica-te que indicaste o nome correcto.',logintest):
+            mensagemok('Toutbox',traducao(40003))
+            entrarnovamente(1)
+            return False
+      elif re.search(username_tb,logintest):
+            #xbmc.executebuiltin("XBMC.Notification(toutbox.fr,"+traducao(40004)+",'500000',"+iconpequeno.encode('utf-8')+")")
+            net.save_cookies(cookies)
+            #if not defora: menu_principal(1)
+            return True
+      
+      elif re.search('Erro',logintest) or link=='Erro':
+            opcao= xbmcgui.Dialog().yesno('Toutbox', traducao(40005), "", "",traducao(40006), 'OK')
+            return False
+            #if opcao: menu_principal(0)
+            #else: login_toutbox()
+      else: return False
 
 
 ################################################### MENUS PLUGIN ######################################################
@@ -123,11 +168,13 @@ def menu_principal(ligacao):
       if ligacao==1:
             addDir('[B][COLOR red]Addon em actualização/manutenção! Possíveis bugs.[/COLOR][/B]',MainURL,1,wtpath + art + 'pasta.png',1,True)
             addDir(traducao(40007),MainURL,1,wtpath + art + 'pasta.png',1,True)
-            addDir('Mais Recentes',MinhaMainURL,2,wtpath + art + 'pasta.png',2,True)
+            addDir('Mais Recentes',MainURL,2,wtpath + art + 'pasta.png',2,True)
             if status_abelhas: addDir('A Minha Abelha',MainURL + username_ab,3,wtpath + art + 'pasta.png',2,True)
             if status_minhateca: addDir('A Minha Minhateca',MinhaMainURL + username_mt,3,wtpath + art + 'pasta.png',2,True)
+            if status_toutbox: addDir('A Minha Toutbox',ToutMainURL + username_tb,3,wtpath + art + 'pasta.png',2,True)
             if status_abelhas: addDir('Ir para uma Abelha','pastas',5,wtpath + art + 'pasta.png',2,True)
             if status_minhateca: addDir('Ir para uma Minhateca','pastas',5,wtpath + art + 'pasta.png',2,True)
+            if status_toutbox: addDir('Ir para uma Toutbox','pastas',5,wtpath + art + 'pasta.png',2,True)
             addDir(traducao(40037),MainURL,9,wtpath + art + 'pasta.png',2,True)
             addDir('Atalhos',MainURL,18,wtpath + art + 'pasta.png',2,True)
             addDir(traducao(40011),'pesquisa',7,wtpath + art + 'pasta.png',3,True)
@@ -153,6 +200,11 @@ def topcolecionadores():
             users=re.compile('<li><div class="friend avatar"><a href="/(.+?)" title="(.+?)"><img alt=".+?" src="(.+?)" /><span></span></a></div>.+?<i>(.+?)</i></li>').findall(conteudo)
             for urluser,nomeuser,thumbuser,nruser in users:
                   addDir('[B][COLOR blue]' + nruser + 'º Minhateca[/B][/COLOR] ' + nomeuser,MinhaMainURL + urluser,3,thumbuser,len(users),True)
+      if status_toutbox:
+            conteudo=clean(abrir_url_cookie('http://toutbox.fr/' + username_tb))
+            users=re.compile('<li><div class="friend avatar"><a href="/(.+?)" title="(.+?)"><img alt=".+?" src="(.+?)" /><span></span></a></div>.+?<i>(.+?)</i></li>').findall(conteudo)
+            for urluser,nomeuser,thumbuser,nruser in users:
+                  addDir('[B][COLOR aquamarine]' + nruser + 'º Toutbox[/B][/COLOR] ' + nomeuser,ToutMainURL + urluser,3,thumbuser,len(users),True)
       #xbmc.executebuiltin("Container.SetViewMode(500)")
       xbmcplugin.setContent(int(sys.argv[1]), 'livetv')
 
@@ -167,12 +219,18 @@ def abelhasmaisrecentes(url):
             users=re.compile('<div class="friend avatar"><a href="/(.+?)" title="(.+?)"><img alt=".+?" src="(.+?)" /><span>').findall(conteudo)
             for urluser,nomeuser,thumbuser in users:
                   addDir('[B][COLOR blue]' + nomeuser + '[/B][/COLOR]',MinhaMainURL + urluser,3,thumbuser,len(users),True)
+      if status_toutbox:
+            conteudo=clean(abrir_url_cookie('http://toutbox.fr/action/LastAccounts/MoreAccounts'))
+            users=re.compile('<div class="friend avatar"><a href="/(.+?)" title="(.+?)"><img alt=".+?" src="(.+?)" /><span>').findall(conteudo)
+            for urluser,nomeuser,thumbuser in users:
+                  addDir('[B][COLOR aquamarine]' + nomeuser + '[/B][/COLOR]',ToutMainURL + urluser,3,thumbuser,len(users),True)
       #xbmc.executebuiltin("Container.SetViewMode(500)")
       xbmcplugin.setContent(int(sys.argv[1]), 'livetv')
 
 def pesquisa():
-      if status_abelhas: conteudo=clean(abrir_url_cookie('http://abelhas.pt/action/Help'))
+      if status_toutbox: conteudo=clean(abrir_url_cookie('http://toutbox.fr/action/Help'))
       if status_minhateca: conteudo=clean(abrir_url_cookie('http://minhateca.com.br/action/Help'))
+      if status_abelhas: conteudo=clean(abrir_url_cookie('http://abelhas.pt/action/Help'))
       opcoeslabel=re.compile('<option value=".+?">(.+?)</option>').findall(conteudo)
       opcoesvalue=re.compile('<option value="(.+?)">.+?</option>').findall(conteudo)
       index = xbmcgui.Dialog().select(traducao(40022), opcoeslabel)
@@ -213,6 +271,22 @@ def favoritos():
          for urluser,nomeuser,thumbuser in users:
             addDir(nomeuser,MinhaMainURL + urluser,3,thumbuser,len(users),True)
          paginas(info)
+      if status_toutbox:
+         conteudo=abrir_url_cookie(ToutMainURL + username_tb)
+         chomikid=re.compile('<input id="FriendsTargetChomikName" name="FriendsTargetChomikName" type="hidden" value="(.+?)" />').findall(conteudo)[0]
+         token=re.compile('<input name="__RequestVerificationToken" type="hidden" value="(.+?)" />').findall(conteudo)[0]
+
+         if name==traducao(40037):pagina=1
+         else: pagina=int(name.replace("[COLOR aquamarine]Página ",'').replace(' >>>[/COLOR]',''))
+         form_d = {'page':pagina,'chomikName':chomikid,'__RequestVerificationToken':token}
+         ref_data = {'Accept':'*/*','Content-Type':'application/x-www-form-urlencoded','Host':'toutbox.fr','Origin':'http://toutbox.fr','Referer':url,'User-Agent':user_agent,'X-Requested-With':'XMLHttpRequest'}
+         endlogin=ToutMainURL + 'action/Friends/ShowAllFriends'
+         info= net.http_POST(endlogin,form_data=form_d,headers=ref_data).content.encode('latin-1','ignore')
+         info=info.replace('javascript:;','/javascript:;')
+         users=re.compile('<div class="friend avatar".+?<a href="/(.+?)" title="(.+?)"><img alt=".+?" src="(.+?)" />').findall(info)
+         for urluser,nomeuser,thumbuser in users:
+            addDir(nomeuser,ToutMainURL + urluser,3,thumbuser,len(users),True)
+         paginas(info)
       xbmc.executebuiltin("Container.SetViewMode(500)")
       xbmcplugin.setContent(int(sys.argv[1]), 'livetv')
 
@@ -240,6 +314,18 @@ def proxpesquisa_mt():
     conteudo= net.http_POST(endlogin,form_data=form_d,headers=ref_data).content.encode('latin-1','ignore')
     addon.save_data('temp.txt',form_d)
     pastas(MinhaMainURL + 'action/nada','coco',conteudo=conteudo)
+
+def proxpesquisa_tb():
+    from t0mm0.common.addon import Addon
+    addon=Addon(addon_id)
+    form_d=addon.load_data('temp.txt')
+    ref_data = {'Accept':'*/*','Content-Type':'application/x-www-form-urlencoded','Host':'toutbox.fr','Origin':'http://toutbox.fr','Referer':url,'User-Agent':user_agent,'X-Requested-With':'XMLHttpRequest'}
+    form_d['Page']= form_d['Page'] + 1
+    endlogin=ToutMainURL + 'action/SearchFiles/Results'
+    net.set_cookies(cookies)
+    conteudo= net.http_POST(endlogin,form_data=form_d,headers=ref_data).content.encode('latin-1','ignore')
+    addon.save_data('temp.txt',form_d)
+    pastas(ToutMainURL + 'action/nada','coco',conteudo=conteudo)
 
 def atalhos(type=False):
       pastatracks = os.path.join(pastaperfil, "atalhos")
@@ -290,6 +376,10 @@ def pastas(url,name,formcont={},conteudo='',past=False):
             sitebase=MinhaMainURL
             host='minhateca.com.br'
             color='blue'
+      elif re.search('toutbox.fr',url):
+            sitebase=ToutMainURL
+            host='toutbox.fr'
+            color='aquamarine'
       else:
             sitebase=MainURL
             host='abelhas.pt'
@@ -662,6 +752,80 @@ def criarplaylist(url,name,formcont={},conteudo=''):
                         for extensao,urlficheiro,tituloficheiro,tamanhoficheiro,dataficheiro in items3:
                               tamanhoficheiro=tamanhoficheiro.replace(' ','')
                               analyzer(MinhaMainURL + urlficheiro,subtitles='',playterm='playlist',playlistTitle=tituloficheiro)
+   elif re.search('toutbox.fr',url):
+      mensagemprogresso.create('Toutbox.fr', traducao(40049))
+      playlist = xbmc.PlayList(1)
+      playlist.clear()
+      if re.search('action/SearchFiles',url):
+            ref_data = {'Host': 'toutbox.fr', 'Connection': 'keep-alive', 'Referer': 'http://toutbox.fr/','Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','User-Agent':user_agent,'Referer': 'http://toutbox.fr/'}
+            endlogin=ToutMainURL + 'action/SearchFiles'
+            conteudo= net.http_POST(endlogin,form_data=formcont,headers=ref_data).content.encode('latin-1','ignore')
+            if re.search('O ficheiro n.+?o foi encontrado',conteudo):
+                  mensagemok('Toutbox.fr','Sem resultados.')
+                  sys.exit(0)
+            try:
+                  filename=re.compile('<input name="FileName" type="hidden" value="(.+?)">').findall(conteudo)[0]
+                  try:ftype=re.compile('<input name="FileType" type="hidden" value="(.+?)">').findall(conteudo)[0]
+                  except: ftype='All'
+                  pagina=1
+                  token=re.compile('<input name="__RequestVerificationToken" type="hidden" value="(.+?)"').findall(conteudo)[0]
+                  form_d = {'IsGallery':'True','FileName':filename,'FileType':ftype,'ShowAdultContent':'True','Page':pagina,'__RequestVerificationToken':token}
+                  from t0mm0.common.addon import Addon
+                  addon=Addon(addon_id)
+                  addon.save_data('temp.txt',form_d)
+                  ref_data = {'Accept':'*/*','Content-Type':'application/x-www-form-urlencoded','Host':'toutbox.fr','Origin':'http://toutbox.fr','Referer':url,'User-Agent':user_agent,'X-Requested-With':'XMLHttpRequest'}
+                  endlogin=ToutMainURL + 'action/SearchFiles/Results'
+                  conteudo= net.http_POST(endlogin,form_data=form_d,headers=ref_data).content.encode('latin-1','ignore')
+            except: pass
+      else:
+            if conteudo=='':
+                  extra='?requestedFolderMode=filesList&fileListSortType=Name&fileListAscending=True'
+                  conteudo=clean(abrir_url_cookie(url + extra))
+      if re.search('ProtectedFolderChomikLogin',conteudo):
+            chomikid=re.compile('<input id="ChomikId" name="ChomikId" type="hidden" value="(.+?)" />').findall(conteudo)[0]
+            folderid=re.compile('<input id="FolderId" name="FolderId" type="hidden" value="(.+?)" />').findall(conteudo)[0]
+            foldername=re.compile('<input id="FolderName" name="FolderName" type="hidden" value="(.+?)" />').findall(conteudo)[0]
+            token=re.compile('<input name="__RequestVerificationToken" type="hidden" value="(.+?)" />').findall(conteudo)[0]
+            passwordfolder=caixadetexto('password')
+            form_d = {'ChomikId':chomikid,'FolderId':folderid,'FolderName':foldername,'Password':passwordfolder,'Remember':'true','__RequestVerificationToken':token}
+            ref_data = {'Accept':'*/*','Content-Type':'application/x-www-form-urlencoded','Host':'toutbox.fr','Origin':'http://toutbox.fr','Referer':url,'User-Agent':user_agent,'X-Requested-With':'XMLHttpRequest'}
+            endlogin=ToutMainURL + 'action/Files/LoginToFolder'
+            teste= net.http_POST(endlogin,form_data=form_d,headers=ref_data).content.encode('latin-1','ignore')
+            teste=urllib.unquote(teste)
+            if re.search('IsSuccess":false',teste):
+                  mensagemok('Toutbox.fr',traducao(40002))
+                  sys.exit(0)
+            else: pastas_ref(url)
+      elif re.search('/action/UserAccess/LoginToProtectedWindow',conteudo):
+            chomikid=re.compile('<input id="TargetChomikId" name="TargetChomikId" type="hidden" value="(.+?)" />').findall(conteudo)[0]
+            chomiktype=re.compile('<input id="Mode" name="Mode" type="hidden" value="(.+?)" />').findall(conteudo)[0]
+            #sex=re.compile('<input id="Sex" name="Sex" type="hidden" value="(.+?)" />').findall(conteudo)[0]
+            accname=re.compile('<input id="__accno" name="__accno" type="hidden" value="(.+?)" />').findall(conteudo)[0]
+            #isadult=re.compile('<input id="AdultFilter" name="AdultFilter" type="hidden" value="(.+?)" />').findall(conteudo)[0]
+            #adultfilter=re.compile('<input id="AdultFilter" name="AdultFilter" type="hidden" value="(.+?)" />').findall(conteudo)[0]
+            passwordfolder=caixadetexto('password')
+            form_d = {'Password':passwordfolder,'OK':'OK','RemeberMe':'true','AccountName':accname,'ChomikType':chomiktype,'TargetChomikId':chomikid}
+            ref_data = {'Accept':'*/*','Content-Type':'application/x-www-form-urlencoded','Host':'toutbox.fr','Origin':'http://toutbox.fr','Referer':url,'User-Agent':user_agent,'X-Requested-With':'XMLHttpRequest'}
+            endlogin=ToutMainURL + 'action/UserAccess/LoginToProtectedWindow'
+            teste= net.http_POST(endlogin,form_data=form_d,headers=ref_data).content.encode('latin-1','ignore')
+            teste=urllib.unquote(teste)
+            if re.search('<span class="field-validation-error">A password introduzida est',teste):
+                  mensagemok('Toutbox.fr',traducao(40002))
+                  sys.exit(0)
+            else: pastas_ref(url)
+      else:
+            items1=re.compile('<a class="expanderHeader downloadAction" href="(.+?)" title="(.+?)">.+?</span>(.+?)</a>.+?<li><span>(.+?)</span></li>.+?<span class="downloadsCounter">.+?<li>(.+?)</li>').findall(conteudo)
+            for urlficheiro,tituloficheiro,extensao,tamanhoficheiro,dataficheiro in items1: analyzer(ToutMainURL + urlficheiro,subtitles='',playterm='playlist',playlistTitle=tituloficheiro)
+            items2=re.compile('<a class="downloadAction" href="(.+?)">\s+<span class="bold">(.+?)</span>(.+?)</a>.+?<li>(.+?)</li>.+?<li><span class="date">(.+?)</span></li>').findall(conteudo)
+            for urlficheiro,tituloficheiro,extensao,tamanhoficheiro,dataficheiro in items2: analyzer(ToutMainURL + urlficheiro,subtitles='',playterm='playlist',playlistTitle=tituloficheiro)
+            if not items1:
+                  if not items2:
+                        conteudo=clean(conteudo)
+                        #isto ta feio
+                        items3=re.compile('<li class="fileItemContainer">.+?<span class="bold">.+?</span>(.+?)</a>.+?<div class="thumbnail">.+?<a href="(.+?)".+?title="(.+?)">\s+<img.+?<div class="smallTab">.+?<li>(.+?)</li>.+?<span class="date">(.+?)</span>').findall(conteudo)
+                        for extensao,urlficheiro,tituloficheiro,tamanhoficheiro,dataficheiro in items3:
+                              tamanhoficheiro=tamanhoficheiro.replace(' ','')
+                              analyzer(ToutMainURL + urlficheiro,subtitles='',playterm='playlist',playlistTitle=tituloficheiro)
    else:
       mensagemprogresso.create('Abelhas.pt', traducao(40049))
       playlist = xbmc.PlayList(1)
@@ -749,6 +913,11 @@ def paginas(link):
             nextname='Minhateca'
             color='blue'
             mode=24
+      elif re.search('toutbox.fr',link):
+            sitebase=ToutMainURL
+            nextname='Toutbox'
+            color='aquamarine'
+            mode=25
       else:
             sitebase=MainURL
             nextname='Abelhas'
@@ -788,6 +957,10 @@ def analyzer(url,subtitles='',playterm=False,playlistTitle=''):
             sitebase=MinhaMainURL
             host='minhateca.com.br'
             sitename='Minhateca'
+      elif re.search('toutbox.fr',url):
+            sitebase=ToutMainURL
+            host='toutbox.fr'
+            sitename='Toutbox'
       else:
             sitebase=MainURL
             host='abelhas.pt'
@@ -868,6 +1041,8 @@ def legendas(moviefileid,url):
 def comecarvideo(name,url,playterm,legendas=None):
         if re.search('minhateca.com.br',url):
               sitename='Minhateca - '+name
+        elif re.search('toutbox.fr',url):
+              sitename='Toutbox - '+name
         else:
               sitename='Abelhas - '+name
       
@@ -1025,6 +1200,7 @@ def caixadetexto(url,ftype=''):
       save=False
       if url=='pastas' and re.search('Abelha',name): title="Ir para - Abelhas.pt"
       elif url=='pastas' and re.search('Minhateca',name): title="Ir para - Minhateca"
+      elif url=='pastas' and re.search('Toutbox',name): title="Ir para - Toutbox"
       elif url=='password': title="Password - Abelhas.pt"
       elif url=='pesquisa':
             title=traducao(40031)
@@ -1040,6 +1216,7 @@ def caixadetexto(url,ftype=''):
             if save==True: selfAddon.setSetting('ultima-pesquisa', search)
             if url=='pastas' and re.search('Abelha',name): pastas(MainURL + search,name)
             elif url=='pastas' and re.search('Minhateca',name): pastas(MinhaMainURL + search,name) 
+            elif url=='pastas' and re.search('Toutbox',name): pastas(ToutMainURL + search,name) 
             elif url=='password': return search
             elif url=='pesquisa':
                   if status_abelhas:
@@ -1048,6 +1225,9 @@ def caixadetexto(url,ftype=''):
                   if status_minhateca:
                         form_d = {'FileName':encode,'submitSearchFiles':'Buscar','FileType':ftype,'IsGallery':'False'}
                         pastas(MinhaMainURL + 'action/SearchFiles',name,formcont=form_d,past=True)
+                  if status_toutbox:
+                        form_d = {'FileName':encode,'submitSearchFiles':'Buscar','FileType':ftype,'IsGallery':'False'}
+                        pastas(ToutMainURL + 'action/SearchFiles',name,formcont=form_d,past=True)
             
       else: sys.exit(0)
             
@@ -1087,6 +1267,8 @@ def abrir_url_cookie(url,erro=True):
                ref_data = {'Host': 'abelhas.pt', 'Connection': 'keep-alive', 'Referer': 'http://abelhas.pt/','Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','User-Agent':user_agent,'Referer': 'http://abelhas.pt/'}
             if status_minhateca:
                ref_data = {'Host': 'minhateca.com.br', 'Connection': 'keep-alive', 'Referer': 'http://minhateca.com.br/','Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','User-Agent':user_agent,'Referer': 'http://minhateca.com.br/'}
+            if status_toutbox:
+               ref_data = {'Host': 'toutbox.fr', 'Connection': 'keep-alive', 'Referer': 'http://toutbox.fr/','Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','User-Agent':user_agent,'Referer': 'http://toutbox.fr/'}
             link=net.http_POST(url,ref_data).content.encode('latin-1','ignore')
             return link
       except urllib2.HTTPError, e:
@@ -1382,8 +1564,8 @@ print "Name: "+str(tamanhoparavariavel)
 
 if mode==None or url==None or len(url)<1:
       print "Versao Instalada: v" + versao
-      if selfAddon.getSetting('abelhas-enable') == 'false' and selfAddon.getSetting('minhateca-enable') == 'false':
-            ok = mensagemok('Abelhas.pt / Minhateca','Precisa de configurar a(s) conta(s)','para aceder aos conteudos.')
+      if selfAddon.getSetting('abelhas-enable') == 'false' and selfAddon.getSetting('minhateca-enable') == 'false' and selfAddon.getSetting('toutbox-enable') == 'false':
+            ok = mensagemok('Abelhas.pt / Minhateca / Toutbox','Precisa de configurar a(s) conta(s)','para aceder aos conteudos.')
             entrarnovamente(1)
       else:
             
@@ -1399,6 +1581,12 @@ if mode==None or url==None or len(url)<1:
                         status_minhateca=True
                         selfAddon.setSetting('minhateca-check',"true")
                   else: selfAddon.setSetting('minhateca-check',"false")
+            if selfAddon.getSetting('toutbox-enable') == 'true' and not selfAddon.getSetting('toutbox-username')== '':
+                  if login_toutbox():
+                        global status_toutbox
+                        status_toutbox=True
+                        selfAddon.setSetting('toutbox-check',"true")
+                  else: selfAddon.setSetting('toutbox-check',"false")
             menu_principal(1)
             
                   
@@ -1426,4 +1614,5 @@ elif mode==21: atalhos(type='remove')
 elif mode==22: pastas('/'.join(url.split('/')[:-1]),name)
 elif mode==23: pastas_de_fora(url,name)
 elif mode==24: proxpesquisa_mt()
+elif mode==25: proxpesquisa_tb()
 xbmcplugin.endOfDirectory(int(sys.argv[1]))
