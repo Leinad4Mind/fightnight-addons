@@ -1,3 +1,7 @@
+[B]v1.0.2 (22 de Maio de 2015):[/B]
+Addon em actualizacao.
+- AdiÃ§Ã£o de Toutbox (tks Leinad4Mind).
+
 [B]v1.0.1 (5 de Abril de 2015):[/B]
 Addon em actualizacao.
 - Fix criar playlist (tks Leinad4Mind).
@@ -28,8 +32,8 @@ Addon em actualizacao.
 [B]v0.0.13 (28 de Outubro de 2014):[/B]
 - Adicionado sistema automatico para pesquisa de legendas (ty mafarricos).
 - Corrigido legendas na mesma pasta. (ty mafarricos)
-- Adicionada opção para trailers (ty mafarricos).
-- Outras correcções.
+- Adicionada opÃ§Ã£o para trailers (ty mafarricos).
+- Outras correcÃ§Ãµes.
 
 [B]v0.0.12 (26 de Agosto de 2014):[/B]
 - Fix no espaco ocupado por cada utilizador.
