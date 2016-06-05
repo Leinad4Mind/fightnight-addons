@@ -51,7 +51,7 @@ def request(url,special=False):
                   rest=''.join(')'.join('('.join(multiple.split('(')[1:]).split(')')).split('- ')[1:])
                   addDir('[COLOR orange]%s[/COLOR][COLOR darkorange](%s)[/COLOR][COLOR blue] - [/COLOR][COLOR white]%s[/COLOR]' % (data,hora,rest),MainURL + endereco,1,os.path.join(art,'%s.png' % (thumb)),len(listagolos),pasta=False)
       else:
-            listagolos=re.compile('<div class=".+?"><a href="(.+?)"><img.+?src="images/(.+?)\..+?" />\s+?([0-9]{4}\.[0-9]{2}\.[0-9]{2})\s*(\([0-9]{2}h[0-9]{2}\))\s*-\s*([A-Za-z ]+?)\s*([0-9]*)\s*-\s*([0-9]*)\s*(.+?)</a></div>').findall(link)
+            listagolos=re.compile('<div class=".+?"><a href="(.+?)"><img.+?src="images/(.+?)\..+?" />\s+?([0-9]{4}\.[0-9]{2}\.[0-9]{2})\s*(\([0-9]{2}h[0-9]{2}\))\s*-\s*([A-Za-z ]+?)\s+([0-9]*)\s*-\s*([0-9]*)\s*(.+?)</a></div>').findall(link)
             for endereco,thumb,data,hora,equipa1,resultado1,resultado2,equipa2 in listagolos:
                   addDir('[COLOR orange]%s[/COLOR] [COLOR darkorange]%s[/COLOR][COLOR blue] - [/COLOR][COLOR white]%s[/COLOR] [COLOR yellow]%s - %s[/COLOR] [COLOR white]%s[/COLOR]' % (data,hora,equipa1,resultado1,resultado2,equipa2),MainURL + endereco,1,os.path.join(art,'%s.png' % (thumb)),len(listagolos),pasta=False)
 
@@ -349,7 +349,7 @@ def pesquisa():
       if pesquisa:
             xbmcgui.Dialog().ok(traducao(30000),traducao(30009),traducao(30015))
             link=abrir_url( MainURL + 'search.php?dosearch=yes&search_in_archives=yes&title=' + urllib.quote(pesquisa))
-            jogos=re.compile('<div style="font-family:Arial, Helvetica, sans-serif; font-size:12px;"><a href="/(.+?)">([0-9]{4}\.[0-9]{2}\.[0-9]{2})\s*(\([0-9]{2}h[0-9]{2}\))\s*-\s*([A-Za-z ]+?)\s*([0-9]*)\s*-\s*([0-9]*)\s*([A-Za-z ]+?)</a></div>').findall(link)
+            jogos=re.compile('<div style="font-family:Arial, Helvetica, sans-serif; font-size:12px;"><a href="/(.+?)">([0-9]{4}\.[0-9]{2}\.[0-9]{2})\s*(\([0-9]{2}h[0-9]{2}\))\s*-\s*([A-Za-z ]+?)\s+([0-9]*)\s*-\s*([0-9]*)\s*([A-Za-z ]+?)</a></div>').findall(link)
             for endereco,data,hora,equipa1,resultado1,resultado2,equipa2 in jogos:
                   addDir('[COLOR orange]%s[/COLOR] [COLOR darkorange]%s[/COLOR][COLOR blue] - [/COLOR][COLOR white]%s[/COLOR] [COLOR yellow]%s - %s[/COLOR] [COLOR white]%s[/COLOR]' % (data,hora,equipa1,resultado1,resultado2,equipa2),MainURL + endereco,1,os.path.join(art,'proxima.png'),len(jogos),pasta=False)
             if "confluence" in xbmc.getSkinDir(): xbmc.executebuiltin("Container.SetViewMode(51)")
