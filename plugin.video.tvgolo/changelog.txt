@@ -1,3 +1,6 @@
+[B]v1.0.7 (06 de Marco de 2017):[/B]
+- Correccoes no addon (tks Leinad4Mind).
+
 [B]v1.0.3 (26 de Marco de 2016):[/B]
 - Correccoes no addon.
 
